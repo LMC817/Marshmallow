@@ -1755,6 +1755,10 @@
   // ==================== SEARCH ====================
   var searchIndex = [];
   var activeHighlights = [];
+  var searchInput = document.getElementById('searchInput');
+  var searchResults = document.getElementById('searchResults');
+  var searchClear = document.getElementById('searchClear');
+  var searchWrap = document.querySelector('.search-wrap');
 
   function clearHighlights() {
     activeHighlights.forEach(function(mark) {
@@ -1852,14 +1856,12 @@
   }
 
   function performSearch() {
-    var query = document.getElementById('searchInput').value.trim();
-    var resultsEl = document.getElementById('searchResults');
-    var clearBtn = document.getElementById('searchClear');
-    clearBtn.classList.toggle('active', query.length > 0);
-    resultsEl.innerHTML = '';
+    var query = searchInput.value.trim();
+    searchClear.classList.toggle('active', query.length > 0);
+    searchResults.innerHTML = '';
 
     if (!query) {
-      resultsEl.classList.remove('active');
+      searchResults.classList.remove('active');
       return;
     }
 
@@ -1871,8 +1873,8 @@
     });
 
     if (!matches.length) {
-      resultsEl.innerHTML = '<div class="search-result-empty">No results found.</div>';
-      resultsEl.classList.add('active');
+      searchResults.innerHTML = '<div class="search-result-empty">No results found.</div>';
+      searchResults.classList.add('active');
       return;
     }
 
@@ -1898,10 +1900,10 @@
       div.addEventListener('click', function() {
         goToSearchResult(item, query);
       });
-      resultsEl.appendChild(div);
+      searchResults.appendChild(div);
     });
 
-    resultsEl.classList.add('active');
+    searchResults.classList.add('active');
   }
 
   function goToSearchResult(item, query) {
@@ -1927,17 +1929,15 @@
   }
 
   function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('searchClear').classList.remove('active');
-    var resultsEl = document.getElementById('searchResults');
-    resultsEl.classList.remove('active');
-    resultsEl.innerHTML = '';
+    searchInput.value = '';
+    searchClear.classList.remove('active');
+    searchResults.classList.remove('active');
+    searchResults.innerHTML = '';
   }
 
   document.addEventListener('click', function(e) {
-    var wrap = document.querySelector('.search-wrap');
-    if (!wrap.contains(e.target)) {
-      document.getElementById('searchResults').classList.remove('active');
+    if (!searchWrap.contains(e.target)) {
+      searchResults.classList.remove('active');
     }
   });
 
