@@ -46,6 +46,101 @@
     font-size: 0.9em;
     color: var(--brown);
   }
+  .search-wrap {
+    position: relative;
+    max-width: 500px;
+    margin: 20px auto 0;
+  }
+  .search-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1em;
+    padding: 10px 36px 10px 14px;
+    border: 2px solid var(--accent);
+    border-radius: 20px;
+    box-sizing: border-box;
+    outline: none;
+  }
+  .search-clear {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    font-size: 1.2em;
+    line-height: 1;
+    color: var(--brown);
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+  .search-clear.active {
+    display: block;
+  }
+  .search-results {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 6px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+  }
+  .search-results.active {
+    display: block;
+  }
+  .search-result {
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+  }
+  .search-result:last-child {
+    border-bottom: none;
+  }
+  .search-result:hover {
+    background: #f3d9d2;
+  }
+  .search-result-title {
+    color: var(--brown);
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+  .search-snippet {
+    font-size: 0.85em;
+    color: #555;
+    margin-top: 4px;
+  }
+  .search-snippet mark {
+    background: #ffe9a8;
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .search-result-empty {
+    padding: 14px;
+    text-align: center;
+    color: #999;
+    font-size: 0.9em;
+  }
+  mark.search-mark {
+    background: #ffd54f;
+    color: inherit;
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+  @keyframes search-flash {
+    0%, 100% { box-shadow: var(--card-shadow); }
+    25%, 75% { box-shadow: 0 0 0 4px #f9c66b, var(--card-shadow); }
+  }
+  .search-flash {
+    animation: search-flash 1.6s ease-in-out;
+  }
   .tabs {
     display: flex;
     flex-wrap: wrap;
@@ -161,6 +256,12 @@
 
 <h1>Fluff</h1>
 <p class="subtitle">Homemade marshmallow spread</p>
+
+<div class="search-wrap">
+  <input type="text" id="searchInput" class="search-input" placeholder="Search recipes, ingredients, tips…" autocomplete="off" oninput="performSearch()" onkeydown="if (event.key === 'Escape') clearSearch();">
+  <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Clear search">&times;</button>
+  <div class="search-results" id="searchResults"></div>
+</div>
 
 <div class="tabs">
   <button class="tab-btn active" data-tab="tab-ka" onclick="switchTab('tab-ka')">King Arthur Recipe</button>
@@ -536,6 +637,172 @@
     document.getElementById(id).classList.add('active');
     document.querySelector('.tab-btn[data-tab="' + id + '"]').classList.add('active');
   }
+
+  // ==================== SEARCH ====================
+  var searchIndex = [];
+  var activeHighlights = [];
+
+  function clearHighlights() {
+    activeHighlights.forEach(function(mark) {
+      var parent = mark.parentNode;
+      if (!parent) return;
+      parent.replaceChild(document.createTextNode(mark.textContent), mark);
+      parent.normalize();
+    });
+    activeHighlights = [];
+  }
+
+  function highlightInElement(el, query) {
+    var q = query.toLowerCase();
+    if (!q) return;
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    var textNodes = [];
+    var node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue.toLowerCase().indexOf(q) !== -1) {
+        textNodes.push(node);
+      }
+    }
+    textNodes.forEach(function(textNode) {
+      var text = textNode.nodeValue;
+      var lower = text.toLowerCase();
+      var frag = document.createDocumentFragment();
+      var lastIndex = 0;
+      var idx;
+      while ((idx = lower.indexOf(q, lastIndex)) !== -1) {
+        if (idx > lastIndex) {
+          frag.appendChild(document.createTextNode(text.slice(lastIndex, idx)));
+        }
+        var mark = document.createElement('mark');
+        mark.className = 'search-mark';
+        mark.textContent = text.slice(idx, idx + q.length);
+        frag.appendChild(mark);
+        activeHighlights.push(mark);
+        lastIndex = idx + q.length;
+      }
+      if (lastIndex < text.length) {
+        frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+      textNode.parentNode.replaceChild(frag, textNode);
+    });
+  }
+
+  function buildSearchIndex() {
+    document.querySelectorAll('.tab-content').forEach(function(tabContent) {
+      var tabId = tabContent.id;
+      var tabBtn = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+      var tabName = tabBtn ? tabBtn.textContent.trim() : '';
+      var titleEl = tabContent.querySelector('.subtitle');
+      var title = titleEl ? titleEl.textContent.trim() : tabName;
+      searchIndex.push({
+        tabId: tabId,
+        tabName: tabName,
+        subtabId: null,
+        title: title,
+        text: tabContent.textContent.replace(/\s+/g, ' ').trim(),
+        el: tabContent
+      });
+    });
+  }
+
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function performSearch() {
+    var query = document.getElementById('searchInput').value.trim();
+    var resultsEl = document.getElementById('searchResults');
+    var clearBtn = document.getElementById('searchClear');
+    clearBtn.classList.toggle('active', query.length > 0);
+    resultsEl.innerHTML = '';
+
+    if (!query) {
+      resultsEl.classList.remove('active');
+      return;
+    }
+
+    clearHighlights();
+
+    var q = query.toLowerCase();
+    var matches = searchIndex.filter(function(item) {
+      return item.text.toLowerCase().indexOf(q) !== -1 || item.title.toLowerCase().indexOf(q) !== -1;
+    });
+
+    if (!matches.length) {
+      resultsEl.innerHTML = '<div class="search-result-empty">No results found.</div>';
+      resultsEl.classList.add('active');
+      return;
+    }
+
+    var re = new RegExp('(' + escapeRegExp(query) + ')', 'ig');
+
+    matches.slice(0, 25).forEach(function(item) {
+      var text = item.text;
+      var idx = text.toLowerCase().indexOf(q);
+      var snippet;
+      if (idx === -1) {
+        snippet = text.slice(0, 120);
+      } else {
+        var start = Math.max(0, idx - 40);
+        var end = Math.min(text.length, idx + q.length + 80);
+        snippet = (start > 0 ? '… ' : '') + text.slice(start, end) + (end < text.length ? ' …' : '');
+      }
+      snippet = escapeHtml(snippet).replace(re, '<mark>$1</mark>');
+
+      var div = document.createElement('div');
+      div.className = 'search-result';
+      var label = item.tabName + (item.title && item.title !== item.tabName ? ' › ' + item.title : '');
+      div.innerHTML = '<div class="search-result-title">' + escapeHtml(label) + '</div><div class="search-snippet">' + snippet + '</div>';
+      div.addEventListener('click', function() {
+        goToSearchResult(item, query);
+      });
+      resultsEl.appendChild(div);
+    });
+
+    resultsEl.classList.add('active');
+  }
+
+  function goToSearchResult(item, query) {
+    switchTab(item.tabId);
+    clearSearch();
+    clearHighlights();
+    highlightInElement(item.el, query);
+    setTimeout(function() {
+      var target = item.el.querySelector('.search-mark') || item.el;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      item.el.classList.remove('search-flash');
+      requestAnimationFrame(function() {
+        item.el.classList.add('search-flash');
+      });
+      setTimeout(function() {
+        item.el.classList.remove('search-flash');
+      }, 1700);
+    }, 50);
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').classList.remove('active');
+    var resultsEl = document.getElementById('searchResults');
+    resultsEl.classList.remove('active');
+    resultsEl.innerHTML = '';
+  }
+
+  document.addEventListener('click', function(e) {
+    var wrap = document.querySelector('.search-wrap');
+    if (!wrap.contains(e.target)) {
+      document.getElementById('searchResults').classList.remove('active');
+    }
+  });
+
+  buildSearchIndex();
 </script>
 
 </body>
