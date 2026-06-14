@@ -4,9 +4,15 @@
 <meta charset="UTF-8">
 <title>Fluff (Marshmallow Spread)</title>
 <style>
+  :root {
+    --accent: #c0392b;
+    --brown: #6d4c41;
+    --cream: #fdf6ec;
+    --card-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
   body {
     font-family: Georgia, 'Times New Roman', serif;
-    background: #fdf6ec;
+    background: var(--cream);
     color: #3a2e2e;
     max-width: 800px;
     margin: 40px auto;
@@ -15,14 +21,30 @@
   }
   h1 {
     text-align: center;
-    color: #c0392b;
+    color: var(--accent);
     font-size: 2.5em;
     margin-bottom: 0;
   }
   h2 {
-    border-bottom: 2px solid #c0392b;
+    border-bottom: 2px solid var(--accent);
     padding-bottom: 5px;
-    color: #6d4c41;
+    color: var(--brown);
+  }
+  .subtitle {
+    text-align: center;
+    font-style: italic;
+  }
+  .recipe-link {
+    text-align: center;
+    font-size: 0.9em;
+  }
+  .recipe-link a {
+    color: var(--accent);
+  }
+  .recipe-meta {
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--brown);
   }
   .tabs {
     display: flex;
@@ -38,14 +60,14 @@
     border: none;
     border-radius: 8px 8px 0 0;
     background: #eee;
-    color: #6d4c41;
+    color: var(--brown);
     cursor: pointer;
   }
   .tab-btn:hover {
     background: #f3d9d2;
   }
   .tab-btn.active {
-    background: #c0392b;
+    background: var(--accent);
     color: #fff;
   }
   .tab-content {
@@ -65,14 +87,14 @@
     background: #fff;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
   }
   .instructions {
     flex: 2 1 400px;
     background: #fff;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
   }
   .ingredients ul {
     list-style: none;
@@ -84,7 +106,7 @@
   }
   .ingredients li:before {
     content: "— ";
-    color: #c0392b;
+    color: var(--accent);
   }
   .instructions ol {
     padding-left: 20px;
@@ -97,7 +119,7 @@
     border-radius: 8px;
     padding: 20px;
     margin-top: 30px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
   }
   .tips h2 {
     border-bottom: 2px solid #f39c12;
@@ -117,7 +139,7 @@
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
     margin-top: 20px;
   }
   .comparison-table th, .comparison-table td {
@@ -127,18 +149,18 @@
     vertical-align: top;
   }
   .comparison-table th {
-    background: #c0392b;
+    background: var(--accent);
     color: #fff;
   }
   .comparison-table tr:nth-child(even) {
-    background: #fdf6ec;
+    background: var(--cream);
   }
 </style>
 </head>
 <body>
 
 <h1>Fluff</h1>
-<p style="text-align:center; font-style:italic;">Homemade marshmallow spread</p>
+<p class="subtitle">Homemade marshmallow spread</p>
 
 <div class="tabs">
   <button class="tab-btn active" data-tab="tab-ka" onclick="switchTab('tab-ka')">King Arthur Recipe</button>
@@ -149,8 +171,8 @@
 </div>
 
 <div id="tab-ka" class="tab-content active">
-  <p style="text-align:center; font-style:italic;">King Arthur Baking recipe for Fluff (Marshmallow Spread)*</p>
-  <p style="text-align:center; font-size:0.9em;"><a href="https://www.kingarthurbaking.com/recipes/homemade-marshmallow-spread-recipe" target="_blank" style="color:#c0392b;">View original recipe on KingArthurBaking.com</a></p>
+  <p class="subtitle">King Arthur Baking recipe for Fluff (Marshmallow Spread)*</p>
+  <p class="recipe-link"><a href="https://www.kingarthurbaking.com/recipes/homemade-marshmallow-spread-recipe" target="_blank">View original recipe on KingArthurBaking.com</a></p>
 
   <div class="container">
     <div class="ingredients">
@@ -197,14 +219,14 @@
   <div class="tips" style="margin-top:20px;">
     <h2>* Note</h2>
     <p>This recipe circulates widely on social media as a set of recipe-card screenshots, often without attribution — it is the King Arthur Baking "Fluff (Marshmallow Spread)" recipe shown above.</p>
-    <img src="fluff recipe 1.jpg" alt="Circulating screenshot of this recipe, originally from King Arthur Baking" style="display:block; max-width:280px; margin:10px auto 0; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+    <img src="screenshot-fluff-recipe.jpg" alt="Circulating screenshot of this recipe, originally from King Arthur Baking" style="display:block; max-width:280px; margin:10px auto 0; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
   </div>
 </div>
 
 <div id="tab-bbb" class="tab-content">
-  <p style="text-align:center; font-style:italic;">Bigger Bolder Baking recipe by Gemma Stafford</p>
-  <p style="text-align:center; font-size:0.9em;"><a href="https://www.biggerbolderbaking.com/homemade-marshmallow-fluff/" target="_blank" style="color:#c0392b;">View original recipe on BiggerBolderBaking.com</a></p>
-  <p style="text-align:center; font-size:0.9em; color:#6d4c41;">Servings: 6 cups &nbsp;|&nbsp; Prep Time: 20 mins &nbsp;|&nbsp; Cook Time: 10 mins &nbsp;|&nbsp; Total Time: 30 mins</p>
+  <p class="subtitle">Bigger Bolder Baking recipe by Gemma Stafford</p>
+  <p class="recipe-link"><a href="https://www.biggerbolderbaking.com/homemade-marshmallow-fluff/" target="_blank">View original recipe on BiggerBolderBaking.com</a></p>
+  <p class="recipe-meta">Servings: 6 cups &nbsp;|&nbsp; Prep Time: 20 mins &nbsp;|&nbsp; Cook Time: 10 mins &nbsp;|&nbsp; Total Time: 30 mins</p>
 
   <div class="container">
     <div class="ingredients">
@@ -251,9 +273,9 @@
 </div>
 
 <div id="tab-ss" class="tab-content">
-  <p style="text-align:center; font-style:italic;">Homemade Marshmallow Creme (Marshmallow Fluff) by Tammy Spencer, Scotch &amp; Scones</p>
-  <p style="text-align:center; font-size:0.9em;"><a href="https://www.scotchandscones.com/marshmallow-creme/" target="_blank" style="color:#c0392b;">View original recipe on ScotchAndScones.com</a></p>
-  <p style="text-align:center; font-size:0.9em; color:#6d4c41;">Servings: 6 oz &nbsp;|&nbsp; Calories: 228 kcal &nbsp;|&nbsp; Prep Time: 10 mins &nbsp;|&nbsp; Cook Time: 15 mins &nbsp;|&nbsp; Total Time: 25 mins</p>
+  <p class="subtitle">Homemade Marshmallow Creme (Marshmallow Fluff) by Tammy Spencer, Scotch &amp; Scones</p>
+  <p class="recipe-link"><a href="https://www.scotchandscones.com/marshmallow-creme/" target="_blank">View original recipe on ScotchAndScones.com</a></p>
+  <p class="recipe-meta">Servings: 6 oz &nbsp;|&nbsp; Calories: 228 kcal &nbsp;|&nbsp; Prep Time: 10 mins &nbsp;|&nbsp; Cook Time: 15 mins &nbsp;|&nbsp; Total Time: 25 mins</p>
 
   <div class="container">
     <div class="ingredients">
@@ -299,7 +321,7 @@
 </div>
 
 <div id="tab-stab" class="tab-content">
-  <p style="text-align:center; font-style:italic;">Stabilized Marshmallow Fluff by Linda Brookes, July 2025</p>
+  <p class="subtitle">Stabilized Marshmallow Fluff by Linda Brookes, July 2025</p>
 
   <div class="container">
     <div class="ingredients">
@@ -349,7 +371,7 @@
 </div>
 
 <div id="tab-compare" class="tab-content">
-  <p style="text-align:center; font-style:italic;">How the four marshmallow fluff recipes stack up</p>
+  <p class="subtitle">How the four marshmallow fluff recipes stack up</p>
 
   <table class="comparison-table">
     <tr>
