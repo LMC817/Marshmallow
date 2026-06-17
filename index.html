@@ -12,6 +12,9 @@
     --vegan-light: #eaf3e6;
     --card-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     font-family: Georgia, 'Times New Roman', serif;
     background: var(--cream);
@@ -275,6 +278,34 @@
     padding: 20px;
     margin-top: 30px;
     box-shadow: var(--card-shadow);
+  }
+  .tips:target {
+    animation: tip-flash 1.7s ease;
+  }
+  @keyframes tip-flash {
+    0% { box-shadow: 0 0 0 3px var(--accent); }
+    100% { box-shadow: var(--card-shadow); }
+  }
+  .tips-index {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0 5px;
+  }
+  .tips-index-btn {
+    font-family: inherit;
+    font-size: 0.85em;
+    padding: 7px 14px;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    background: #fff;
+    color: var(--brown);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .tips-index-btn:hover {
+    background: #f3d9d2;
   }
   .tips h2 {
     border-bottom: 2px solid #f39c12;
@@ -2079,13 +2110,20 @@
 <div id="tab-tips" class="tab-content">
   <p class="subtitle">General tips, high-altitude adjustments, and ingredient substitutions</p>
 
-  <div class="tips">
+  <nav class="tips-index">
+    <a class="tips-index-btn" href="#tip-egg-white">Egg White Substitute</a>
+    <a class="tips-index-btn" href="#tip-corn-syrup">Corn Syrup Substitute</a>
+    <a class="tips-index-btn" href="#tip-high-altitude">General Tips</a>
+    <a class="tips-index-btn" href="#tip-flavor-ideas">More Flavor Ideas</a>
+  </nav>
+
+  <div class="tips" id="tip-egg-white">
     <h2>Egg White Substitute (Meringue Powder)</h2>
     <p>For every 1 egg white, use 1 tablespoon meringue powder + 5 teaspoons of water. Whisk together until smooth before whipping, just as you would with fresh egg whites.</p>
     <p style="margin-top:12px;"><em>*Note: meringue powder still contains dried egg whites — this substitution is not egg-free.</em></p>
   </div>
 
-  <div class="tips">
+  <div class="tips" id="tip-corn-syrup">
     <h2>Perfect Homemade Corn Syrup Substitute</h2>
     <p class="recipe-meta">By Gemma Stafford (Bigger Bolder Baking) &nbsp;|&nbsp; Prep Time: 5 mins</p>
     <p>A candy-like sauce that cooks up super thick, full-bodied, and sweet just like real corn syrup — a perfect invert sugar for marshmallow making.</p>
@@ -2113,7 +2151,7 @@
     <p style="margin-top:12px;"><em>Note: The lemon juice and cream of tartar prevent the sugars from crystallizing once stored.</em></p>
   </div>
 
-  <div class="tips">
+  <div class="tips" id="tip-high-altitude">
     <h2>High Altitude Tips for Making Marshmallows</h2>
     <p>By Lalie (@geekmallows)</p>
     <img class="infographic" src="marshmallow-images/high-altitude-tips-1.jpg" alt="High Altitude Tips for Making Marshmallows, part 1: All the Corn Syrup, Bloomin' Gelatin, Check That Temp">
@@ -2121,7 +2159,7 @@
     <img class="infographic" src="marshmallow-images/high-altitude-tips-3.jpg" alt="General Tips for Making Marshmallows: coloring, flavor, crystallization, thermometers, gelatin, prep, additives">
   </div>
 
-  <div class="tips">
+  <div class="tips" id="tip-flavor-ideas">
     <h2>More Flavor Ideas</h2>
     <p>McCormick has a marshmallow infographic with additional flavor ideas and tips: <a href="https://mccormick.new-media-release.com/2015hug_in_a_mug/pages/gallery.html" target="_blank">view the McCormick gallery</a>.</p>
   </div>
@@ -2281,7 +2319,7 @@
     }
 
     var sections = container.querySelectorAll(':scope > .tips, :scope > .faq-item');
-    var otherContent = container.querySelector(':scope > *:not(.subtitle):not(.recipe-link):not(.recipe-meta):not(.tips):not(.faq-item)');
+    var otherContent = container.querySelector(':scope > *:not(.subtitle):not(.recipe-link):not(.recipe-meta):not(.tips):not(.faq-item):not(.tips-index)');
     var baseCrumbs = [tabName].concat(path.map(function(p) { return p.name; }));
 
     if (!otherContent && sections.length) {
